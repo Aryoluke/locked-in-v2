@@ -1,10 +1,27 @@
 import 'package:flutter/material.dart';
 import '../../core/app_state.dart';
 
-class LifePage extends StatelessWidget { final AppState state; const LifePage({super.key, required this.state});
-  @override Widget build(BuildContext context) => AnimatedBuilder(animation: state, builder: (_, __) => ListView(padding: const EdgeInsets.all(16), children: [Text('LIFE', style: Theme.of(context).textTheme.headlineMedium), const Text('Small daily actions compound into the glow-up.'), const SizedBox(height: 18), Card(child: Column(children: state.habits.keys.map((h) => CheckboxListTile(value: state.habits[h], onChanged: (_) => state.toggleHabit(h), title: Text(h), subtitle: Text(_subtitle(h), style: const TextStyle(color: Colors.white60)), secondary: Icon(_icon(h), color: state.habits[h]! ? Colors.greenAccent : Colors.white54)).toList())), const SizedBox(height: 12), Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('FASTING (OPTIONAL)', style: TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w900)), const SizedBox(height: 8), const Text('Choose a window such as 16:8 only when it suits your goals and wellbeing.'), const SizedBox(height: 8), OutlinedButton(onPressed: () => _showFast(context), child: const Text('SET CUSTOM WINDOW'))])), const SizedBox(height: 12), Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('GOALS TIMELINE', style: TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w900)), const SizedBox(height: 12), _goal('Build a consistent training habit', 'This week', true), _goal('First muscle-up progression', 'Long-term', false), _goal('Exam readiness', 'Add test date in roadmap build', false)]))), const SizedBox(height: 12), const Card(child: ListTile(leading: Icon(Icons.auto_awesome, color: Colors.pinkAccent), title: Text('Skin, style and life skills'), subtitle: Text('Core habit hooks are here. Personalised skin system, product library and lesson vault are roadmap modules.')))]));
-  String _subtitle(String h) => {'Water goal': 'Personal target from bodyweight', 'Creatine': 'Log consistently; keep hydration up', 'Skincare AM': 'Cleanse • moisturise • SPF', 'Study block': 'Feeds the overall XP streak', 'Cold shower': 'Build exposure gradually'}.entries.firstWhere((e) => e.key == h, orElse: () => const MapEntry('', '')).value;
-  IconData _icon(String h) => h == 'Water goal' ? Icons.water_drop : h == 'Study block' ? Icons.menu_book : h == 'Skincare AM' ? Icons.face : h == 'Cold shower' ? Icons.ac_unit : Icons.medication;
-  Widget _goal(String title, String date, bool done) => ListTile(contentPadding: EdgeInsets.zero, leading: Icon(done ? Icons.check_circle : Icons.radio_button_unchecked, color: done ? Colors.greenAccent : Colors.white54), title: Text(title), subtitle: Text(date));
-  Future<void> _showFast(BuildContext context) async { String window = '16:8'; await showDialog(context: context, builder: (_) => AlertDialog(title: const Text('Fasting window'), content: DropdownButtonFormField<String>(value: window, items: ['14:10', '16:8', '18:6', '20:4', 'OMAD', 'Custom'].map((x) => DropdownMenuItem(value: x, child: Text(x))).toList(), onChanged: (x) => window = x!), actions: [FilledButton(onPressed: () => Navigator.pop(context), child: const Text('SAVE'))])); }
+class LifePage extends StatelessWidget {
+  final AppState state;
+  const LifePage({super.key, required this.state});
+
+  @override
+  Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(16), children: [
+    Text('LIFE', style: Theme.of(context).textTheme.headlineMedium),
+    const Text('Small daily actions compound into the glow-up.'),
+    const SizedBox(height: 18),
+    Card(child: Column(children: state.habits.keys.map((habit) => CheckboxListTile(value: state.habits[habit] ?? false, onChanged: (_) => state.toggleHabit(habit), title: Text(habit), subtitle: Text(_subtitle(habit)), secondary: Icon(_icon(habit), color: state.habits[habit] == true ? Colors.greenAccent : Colors.white54))).toList())),
+    const SizedBox(height: 12),
+    Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('FASTING (OPTIONAL)', style: TextStyle(color: Color(0xFFFFD4AF), fontWeight: FontWeight.w900)), const SizedBox(height: 8), const Text('Choose a window that supports your goals and wellbeing.'), OutlinedButton(onPressed: () => _showFast(context), child: const Text('SET CUSTOM WINDOW'))]))),
+    const SizedBox(height: 12),
+    const Card(child: ListTile(leading: Icon(Icons.auto_awesome, color: Colors.pinkAccent), title: Text('Skin, style and life skills'), subtitle: Text('Core habit hooks are ready for future roadmap modules.'))),
+  ]);
+
+  String _subtitle(String habit) => <String, String>{'Water goal': 'Personal hydration target', 'Creatine': 'Keep hydration up', 'Skincare AM': 'Cleanse · moisturise · SPF', 'Study block': 'Feeds the XP streak', 'Cold shower': 'Build exposure gradually'}[habit] ?? 'One small action, done consistently.';
+  IconData _icon(String habit) => habit == 'Water goal' ? Icons.water_drop : habit == 'Study block' ? Icons.menu_book : habit == 'Cold shower' ? Icons.ac_unit : habit == 'Skincare AM' ? Icons.face : Icons.bolt;
+
+  Future<void> _showFast(BuildContext context) async {
+    var window = '16:8';
+    await showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(title: const Text('Fasting window'), content: DropdownButtonFormField<String>(value: window, items: const ['14:10', '16:8', '18:6', '20:4', 'OMAD'].map((value) => DropdownMenuItem(value: value, child: Text(value))).toList(), onChanged: (value) => window = value ?? window), actions: [FilledButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('SAVE'))]));
+  }
 }
