@@ -1,14 +1,186 @@
 import 'package:flutter/material.dart';
 import '../../core/app_state.dart';
 
-class OnboardingPage extends StatefulWidget { final AppState state; const OnboardingPage({super.key, required this.state}); @override State<OnboardingPage> createState() => _OnboardingPageState(); }
-class _OnboardingPageState extends State<OnboardingPage> {
-  final name = TextEditingController(), weight = TextEditingController(text: '70'), height = TextEditingController(text: '175');
-  String body = 'HYBRID', lockIn = 'STANDARD', diet = 'No preference'; int step = 0;
-  @override void dispose() { name.dispose(); weight.dispose(); height.dispose(); super.dispose(); }
-  @override Widget build(BuildContext context) => Scaffold(body: SafeArea(child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 560), child: Padding(padding: const EdgeInsets.all(24), child: step == 0 ? _welcome() : _personalise()))));
-  Widget _welcome() => Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('LOCKED IN', style: TextStyle(fontSize: 46, fontWeight: FontWeight.w900, color: Color(0xFF10B981))), const SizedBox(height: 12), const Text('Build the body, mind and life you want.', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)), const SizedBox(height: 12), const Text('Offline-first. Private by design. Your progress is yours.', style: TextStyle(fontSize: 16)), const SizedBox(height: 36), FilledButton(onPressed: () => setState(() => step = 1), child: const Text('START PERSONALISATION'))]);
-  Widget _personalise() => ListView(children: [const Text('Your baseline', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900)), const SizedBox(height: 8), const Text('The app uses these inputs to tune hydration, macros and training.'), const SizedBox(height: 20), TextField(controller: name, decoration: const InputDecoration(labelText: 'Name')), const SizedBox(height: 12), Row(children: [Expanded(child: TextField(controller: height, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Height (cm)'))), const SizedBox(width: 12), Expanded(child: TextField(controller: weight, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Weight (kg)')))]), const SizedBox(height: 20), _choice('Physique', ['SLEEPER', 'BULK', 'HYBRID'], body, (v) => setState(() => body = v)), _choice('Lock-in intensity', ['MINI', 'STANDARD', 'FULL'], lockIn, (v) => setState(() => lockIn = v)), _choice('Dietary profile', ['No preference', 'Vegetarian', 'Vegan', 'Pescatarian'], diet, (v) => setState(() => diet = v)), const SizedBox(height: 20), FilledButton(onPressed: () async { await widget.state.saveProfile({'name': name.text.trim().isEmpty ? 'Athlete' : name.text.trim(), 'height': height.text, 'weight': weight.text, 'bodyType': body, 'lockIn': lockIn, 'diet': diet}); if (mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => _HomeLoader(state: widget.state))); }, child: const Text('ENTER THE LOCK-IN'))]);
-  Widget _choice(String title, List<String> values, String current, ValueChanged<String> onChanged) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontWeight: FontWeight.w800)), const SizedBox(height: 8), Wrap(spacing: 8, children: values.map((v) => ChoiceChip(label: Text(v), selected: current == v, onSelected: (_) => onChanged(v))).toList()), const SizedBox(height: 16)]);
+class OnboardingPage extends StatefulWidget {
+  final AppState state;
+  const OnboardingPage({super.key, required this.state});
+
+  @override
+  State<OnboardingPage> createState() => _OnboardingPageState();
 }
-class _HomeLoader extends StatelessWidget { final AppState state; const _HomeLoader({required this.state}); @override Widget build(BuildContext context) => const SizedBox.shrink(); }
+
+class _OnboardingPageState extends State<OnboardingPage> {
+  final name = TextEditingController();
+  final weight = TextEditingController(text: '70');
+  final height = TextEditingController(text: '175');
+  String body = 'HYBRID';
+  String lockIn = 'STANDARD';
+  String diet = 'No preference';
+  int step = 0;
+
+  @override
+  void dispose() {
+    name.dispose();
+    weight.dispose();
+    height.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: step == 0 ? _welcome() : _personalise(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _welcome() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'LOCKED IN',
+          style: TextStyle(
+            fontSize: 46,
+            fontWeight: FontWeight.w900,
+            color: Color(0xFF10B981),
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Build the body, mind and life you want.',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Offline-first. Private by design. Your progress is yours.',
+          style: TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 36),
+        FilledButton(
+          onPressed: () => setState(() => step = 1),
+          child: const Text('START PERSONALISATION'),
+        ),
+      ],
+    );
+  }
+
+  Widget _personalise() {
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        const Text(
+          'Your baseline',
+          style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'The app uses these inputs to tune hydration, macros and training.',
+        ),
+        const SizedBox(height: 20),
+        TextField(
+          controller: name,
+          decoration: const InputDecoration(labelText: 'Name'),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: height,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Height (cm)'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: weight,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Weight (kg)'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        _choice('Physique', ['SLEEPER', 'BULK', 'HYBRID'], body,
+            (value) => setState(() => body = value)),
+        _choice('Lock-in intensity', ['MINI', 'STANDARD', 'FULL'], lockIn,
+            (value) => setState(() => lockIn = value)),
+        _choice(
+          'Dietary profile',
+          ['No preference', 'Vegetarian', 'Vegan', 'Pescatarian'],
+          diet,
+          (value) => setState(() => diet = value),
+        ),
+        const SizedBox(height: 20),
+        FilledButton(
+          onPressed: () async {
+            await widget.state.saveProfile({
+              'name': name.text.trim().isEmpty ? 'Athlete' : name.text.trim(),
+              'height': height.text,
+              'weight': weight.text,
+              'bodyType': body,
+              'lockIn': lockIn,
+              'diet': diet,
+            });
+            if (!mounted) return;
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => _HomeLoader(state: widget.state),
+              ),
+            );
+          },
+          child: const Text('ENTER THE LOCK-IN'),
+        ),
+      ],
+    );
+  }
+
+  Widget _choice(
+    String title,
+    List<String> values,
+    String current,
+    ValueChanged<String> onChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          children: values
+              .map(
+                (value) => ChoiceChip(
+                  label: Text(value),
+                  selected: current == value,
+                  onSelected: (_) => onChanged(value),
+                ),
+              )
+              .toList(),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+}
+
+class _HomeLoader extends StatelessWidget {
+  final AppState state;
+  const _HomeLoader({required this.state});
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
