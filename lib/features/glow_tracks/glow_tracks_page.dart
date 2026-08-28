@@ -1,0 +1,6 @@
+import 'package:flutter/material.dart';
+import '../../core/app_state.dart';
+
+class GlowTracksPage extends StatelessWidget { final AppState state; const GlowTracksPage({super.key, required this.state});
+  @override Widget build(BuildContext context) => Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('FOUR GLOW-UP TRACKS', style: TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w900, letterSpacing: 1.2)), const SizedBox(height: 10), ...['NORMAL GLOW-UP|Style • grooming • presence', 'GYM GLOW-UP|Strength • skills • progression', 'MENTAL & BRAIN|Study • focus • reflection', 'PHYSICAL GLOW-UP|Sleep • recovery • mobility'].asMap().entries.map((e) => Padding(padding: const EdgeInsets.only(bottom: 10), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(children: [Expanded(child: Text(e.value.split('|').first, style: const TextStyle(fontWeight: FontWeight.w800))), Text('${(state.xp + e.key * 37) % 101}%')]), const SizedBox(height: 5), LinearProgressIndicator(value: ((state.xp + e.key * 37) % 101) / 100, color: [Colors.pinkAccent, Colors.greenAccent, Colors.lightBlueAccent, Colors.amber][e.key]), Text(e.value.split('|').last, style: const TextStyle(fontSize: 12, color: Colors.white60))])))])));
+}
